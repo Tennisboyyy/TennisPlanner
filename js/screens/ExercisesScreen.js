@@ -1,38 +1,35 @@
 import React from "react";
-import { StyleSheet, View, FlatList, Pressable } from "react-native";
+import { StyleSheet, View, FlatList, Pressable, ActivityIndicator } from "react-native";
 import { Component } from "react";
 import Exercise from "../components/Exercise";
 import { Feather } from "@expo/vector-icons";
+import FireBase from "../../FireBase";
+import Data from "../Data";
+import NewExercise from "../components/NewExercise";
 
-const exercises = [
-  {
-    exerciseName: "Beispiel Übung",
-    difficulty: 0,
-    fieldType: "Midcourt",
-    focus: ["Beine", "Vorhand"],
-    description: "Bei dieser Übung muss man...",
-    demoVideo: "youtube.com",
-    sketch: ".../bsp.png",
-  },
-  {
-    exerciseName: "Rotary",
-    difficulty: 0,
-    fieldType: "Midcourt",
-    focus: ["Beine", "Vorhand"],
-    description: "Bei dieser Übung muss man...",
-    demoVideo: "youtube.com",
-    sketch: ".../bsp.png",
-  },
-];
+let loading = false;
+let showAdd = false;
 
 export default class ExercisesScreen extends Component {
   render() {
+    async function saveExercise(data) {
+      await FireBase.saveExercise(
+        data.exerciseName,
+        data.difficulty,
+        data.fieldType,
+        data.focus,
+        data.description,
+        data.demoVideo,
+        data.sketch
+      );
+    }
+
     return (
       <View style={styles.container}>
         <FlatList
           style={styles.list}
-          data={exercises}
-          keyExtractor={(item) => item.exerciseName}
+          data={Data.exercises}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <Exercise
               exerciseName={item.exerciseName}
@@ -50,7 +47,10 @@ export default class ExercisesScreen extends Component {
           ItemSeparatorComponent={() => <View style={styles.listSeparator} />}
         />
         <Pressable
-          onPress={() => alert("Modal für neue Übung anzeigen")}
+          onPress={() => {
+            showAdd = true;
+            this.forceUpdate();
+          }}
           style={styles.new}
         >
           <Feather name="plus-square" size={36} color="darkslateblue" />
@@ -62,11 +62,20 @@ export default class ExercisesScreen extends Component {
           <Feather name="filter" size={36} color="darkslateblue" />
         </Pressable>
         <Pressable
-          onPress={() => alert("Übungen aus API aktualisieren")}
+          onPress={async () => {
+            Data.exercises = [];
+            loading = true;
+            this.forceUpdate();
+            Data.exercises = await FireBase.getExercises();
+            loading = false;
+            this.forceUpdate();
+          }}
           style={styles.refresh}
         >
           <Feather name="refresh-cw" size={36} color="darkslateblue" />
         </Pressable>
+        {loading === true ? <ActivityIndicator size='large' color='#242038' style={styles.load}/> : <></>}
+        {showAdd === true ? <NewExercise onCancel={() => {showAdd = false; this.forceUpdate()}} /> : <></>}
       </View>
     );
   }
@@ -101,4 +110,7 @@ const styles = StyleSheet.create({
     position: "absolute",
     top: "2%",
   },
+  load: {
+    position: "absolute"
+  }
 });

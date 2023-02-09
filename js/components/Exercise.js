@@ -10,11 +10,20 @@ import {
 
 const difficultyArray = [
   "Leicht",
-  "Medium",
+  "Mittel",
   "Schwer",
-  "green",
-  "yellow",
-  "red",
+  "#61A164",
+  "#DBCF68",
+  "#DA4D4D",
+];
+
+const fieldArray = [
+  "Kleinfeld",
+  "Mid-Court",
+  "Großfeld",
+  "#E53F3B",
+  "#EBA44A",
+  "#D7C949",
 ];
 
 const exercises = [
@@ -45,9 +54,9 @@ export default function (props) {
       <View style={styles.container}>
         <Text style={{ fontSize: 18, fontWeight: "bold" }}>{exerciseName}</Text>
         <View style={{ flexDirection: "row" }}>
-          <View style={[styles.properties, { backgroundColor: "gray" }]}>
+          <View style={[styles.properties, { backgroundColor: "lightgray" }]}>
             <Text>
-              {focus.length === 2 ? focus[0] + ", " + focus[1] : focus[0]}
+              {focus[1] !== null ? focus[0] + ", " + focus[1] : focus[0]}
             </Text>
           </View>
           <View
@@ -58,8 +67,13 @@ export default function (props) {
           >
             <Text>{difficultyArray[difficulty]}</Text>
           </View>
-          <View style={[styles.properties, { backgroundColor: "blue" }]}>
-            <Text>{fieldType}</Text>
+          <View
+            style={[
+              styles.properties,
+              { backgroundColor: fieldArray[fieldType + 3] },
+            ]}
+          >
+            <Text>{fieldArray[fieldType]}</Text>
           </View>
         </View>
       </View>
